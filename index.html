@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro Trasformatori · MACE</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%238b1a1a'/%3E%3Ctext x='32' y='44' font-size='34' font-family='Arial' font-weight='700' fill='white' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="boot" class="boot">Caricamento…</div>
+
+<!-- ============ LOGIN ============ -->
+<section id="login" class="login" hidden>
+  <form id="loginForm" class="login-card" autocomplete="off">
+    <div class="brand-mark">M</div>
+    <h1>Registro Trasformatori</h1>
+    <p class="muted">MACE Power · MACE Service</p>
+    <label for="pin" class="lbl">PIN di accesso</label>
+    <input id="pin" type="password" inputmode="numeric" maxlength="12" placeholder="••••••" required autofocus>
+    <p id="loginErr" class="err" hidden></p>
+    <button class="btn primary block" type="submit" id="loginBtn">Entra</button>
+    <p id="demoNote" class="demo-note" hidden>Modalità DEMO: Firebase non è ancora configurato, i dati restano solo in questo browser.</p>
+  </form>
+</section>
+
+<!-- ============ APP ============ -->
+<div id="app" hidden>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark sm">M</span>
+      <div><strong>Registro Trasformatori</strong><small>Ingressi in officina</small></div>
+    </div>
+    <nav class="tabs">
+      <button type="button" class="tab active" data-view="nuovo">+ Nuovo ingresso</button>
+      <button type="button" class="tab" data-view="registro">Registro <span id="regCount" class="pill"></span></button>
+    </nav>
+    <button type="button" id="logoutBtn" class="btn ghost sm">Esci</button>
+  </header>
+  <div id="demoBanner" class="demo-banner" hidden>Modalità DEMO: configura Firebase in <code>js/firebase-config.js</code> per salvare i dati in modo condiviso.</div>
+
+  <main>
+    <!-- ---------- NUOVO / MODIFICA ---------- -->
+    <section id="view-nuovo" class="view">
+      <div id="stepAzienda" class="card center">
+        <p class="step-label">Passo 1</p>
+        <h2>Per quale azienda entra il trasformatore?</h2>
+        <div class="azienda-grid">
+          <button type="button" class="azienda-btn" data-azienda="MACE SERVICE">
+            <span class="az-name">MACE SERVICE</span>
+            <span class="az-sub">Assistenza e riparazioni</span>
+          </button>
+          <button type="button" class="azienda-btn" data-azienda="MACE POWER">
+            <span class="az-name">MACE POWER</span>
+            <span class="az-sub">Produzione trasformatori</span>
+          </button>
+        </div>
+      </div>
+
+      <form id="trForm" class="card form" hidden novalidate>
+        <div class="form-head">
+          <div>
+            <h2 id="formTitle">Nuovo ingresso</h2>
+            <p class="muted" id="formSub">Compila i dati e allega i documenti</p>
+          </div>
+          <div class="az-chip"><span id="azChip"></span><button type="button" id="changeAz" class="link">cambia</button></div>
+        </div>
+
+        <fieldset>
+          <legend><span class="num">1</span> Dati trasformatore</legend>
+          <div class="grid">
+            <label>Cliente *<input name="cliente" required></label>
+            <label>Matricola *<input name="matricola" required></label>
+            <label>Potenza (kVA)<input name="potenza" inputmode="decimal"></label>
+            <label>Tensioni<input name="tensioni" placeholder="es. 20 / 0,4 kV"></label>
+            <label class="span2">Difetto / motivo dell'ingresso<textarea name="difetto" rows="2"></textarea></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend><span class="num">2</span> Date</legend>
+          <ol class="timeline">
+            <li><label>Data entrata *<input type="date" name="dataEntrata" required></label></li>
+            <li class="with-check">
+              <label>Data preventivazione<input type="date" name="dataPreventivo"></label>
+              <label class="check"><input type="checkbox" name="garanzia"><span>In garanzia</span></label>
+            </li>
+            <li><label>Data inizio riparazione<input type="date" name="dataInizio"></label></li>
+            <li><label>Data conclusione riparazione<input type="date" name="dataFine"></label></li>
+            <li><label>Data consegna<input type="date" name="dataConsegna"></label></li>
+          </ol>
+          <p id="dateErr" class="err" hidden></p>
+        </fieldset>
+
+        <fieldset>
+          <legend><span class="num">3</span> Documenti PDF</legend>
+          <div class="drop-grid">
+            <div class="drop" data-cat="accettazione" tabindex="0">
+              <input type="file" accept="application/pdf,.pdf" multiple hidden>
+              <div class="drop-head"><strong>Documento di accettazione</strong><span>Trascina qui i PDF o clicca per sceglierli</span></div>
+              <ul class="file-list"></ul>
+            </div>
+            <div class="drop" data-cat="trasporto" tabindex="0">
+              <input type="file" accept="application/pdf,.pdf" multiple hidden>
+              <div class="drop-head"><strong>Documento di trasporto (DDT)</strong><span>Trascina qui i PDF o clicca per sceglierli</span></div>
+              <ul class="file-list"></ul>
+            </div>
+          </div>
+          <p class="hint">Solo PDF, massimo 15 MB per file.</p>
+        </fieldset>
+
+        <fieldset>
+          <legend><span class="num">4</span> Note</legend>
+          <textarea name="note" rows="3" placeholder="Annotazioni libere"></textarea>
+        </fieldset>
+
+        <div class="form-actions">
+          <button type="button" id="cancelBtn" class="btn ghost">Annulla</button>
+          <button type="submit" id="saveBtn" class="btn primary">Salva registrazione</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ---------- REGISTRO ---------- -->
+    <section id="view-registro" class="view" hidden>
+      <div class="print-title">Registro Trasformatori in entrata – stampato il <span id="printDate"></span></div>
+      <div id="stats" class="stats"></div>
+      <div class="card toolbar">
+        <input id="fQ" type="search" placeholder="Cerca cliente, matricola, n°…">
+        <select id="fAz"><option value="">Tutte le aziende</option><option>MACE SERVICE</option><option>MACE POWER</option></select>
+        <select id="fStato"><option value="">Tutti gli stati</option></select>
+        <select id="fGar"><option value="">Garanzia: tutti</option><option value="si">In garanzia</option><option value="no">Non in garanzia</option></select>
+        <select id="fAnno"><option value="">Tutti gli anni</option></select>
+        <div class="toolbar-actions">
+          <button type="button" id="csvBtn" class="btn ghost sm">Esporta Excel (CSV)</button>
+          <button type="button" id="printBtn" class="btn ghost sm">Stampa</button>
+        </div>
+      </div>
+      <div class="card table-card">
+        <div class="table-wrap">
+          <table id="regTable">
+            <thead>
+              <tr>
+                <th>N°</th><th>Azienda</th><th>Cliente</th><th>Matricola</th><th>kVA</th>
+                <th>Entrata</th><th>Preventivo</th><th>Garanzia</th><th>Inizio rip.</th>
+                <th>Fine rip.</th><th>Consegna</th><th>Giorni</th><th>Stato</th><th>PDF</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p id="emptyMsg" class="empty" hidden>Nessun trasformatore trovato.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="modal" class="modal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true"><div id="modalBody"></div></div>
+</div>
+<div id="toasts" class="toasts"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
